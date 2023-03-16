@@ -1,69 +1,3 @@
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.exe
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\oo2core_6_win64.dll
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.deps.json
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.runtimeconfig.json
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.dll
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.pdb
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.dll
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.pdb
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.xml
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.AssemblyReference.cache
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.Form1.resources
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.GenerateResource.cache
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.AssemblyInfoInputs.cache
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.AssemblyInfo.cs
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.CoreCompileInputs.cache
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.CopyComplete
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.dll
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\refint\DS3MapConverter.dll
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.pdb
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.genruntimeconfig.cache
-C:\Users\Isaac Fisher\Downloads\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\ref\DS3MapConverter.dll
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.exe
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\oo2core_6_win64.dll
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.deps.json
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.runtimeconfig.json
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.dll
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.pdb
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.dll
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.pdb
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.xml
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.AssemblyReference.cache
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.Form1.resources
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.GenerateResource.cache
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.GeneratedMSBuildEditorConfig.editorconfig
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.AssemblyInfoInputs.cache
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.AssemblyInfo.cs
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.CoreCompileInputs.cache
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.CopyComplete
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.dll
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\refint\DS3MapConverter.dll
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.pdb
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.genruntimeconfig.cache
-D:\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\ref\DS3MapConverter.dll
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.exe
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\oo2core_6_win64.dll
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.deps.json
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.runtimeconfig.json
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.dll
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.pdb
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.dll
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.pdb
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.xml
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.AssemblyReference.cache
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.Form1.resources
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.GenerateResource.cache
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.AssemblyInfoInputs.cache
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.AssemblyInfo.cs
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.CoreCompileInputs.cache
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.CopyComplete
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.dll
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\refint\DS3MapConverter.dll
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.pdb
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.genruntimeconfig.cache
-C:\Users\Isaac Fisher\Downloads\Syncthing Shared\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\ref\DS3MapConverter.dll
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.exe
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\oo2core_6_win64.dll
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\DS3MapConverter.deps.json
@@ -74,6 +8,7 @@ D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.pdb
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\bin\Debug\net6.0-windows\SoulsFormats.xml
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.AssemblyReference.cache
+D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.DS3MapConverter.resources
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.csproj.GenerateResource.cache
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.GeneratedMSBuildEditorConfig.editorconfig
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.AssemblyInfoInputs.cache
@@ -85,4 +20,3 @@ D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.pdb
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.genruntimeconfig.cache
 D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\ref\DS3MapConverter.dll
-D:\Syncthing Shared\Game Mods & Tools\Tools\FromSoftware\Repositories\Active\DS3MapConverter\DS3MapConverter\obj\Debug\net6.0-windows\DS3MapConverter.DS3MapConverter.resources

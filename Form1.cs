@@ -19,153 +19,52 @@ public partial class DS3MapConverter : Form
         await Task.Run(async () => await ConvertMapToOBJ(dialog.FileName));
     }
 
+    private static FLVER2? ReadFLVERFromBND(string bndFilePath)
+    {
+        if (!File.Exists(bndFilePath)) return null;
+        BND4 bnd = BND4.Read(bndFilePath);
+        BinderFile? flverBinderFile = bnd.Files.Find(i => i.Name.EndsWith(".flver"));
+        if (flverBinderFile == null) return null;
+        FLVER2 flver = FLVER2.Read(flverBinderFile.Bytes);
+        return flver;
+    }
+
     private async Task ConvertMapToOBJ(string mapFilePath)
     {
-        var mapstudioFolder = $@"{Path.GetDirectoryName(mapFilePath)}";
-        var mapFolder = $@"{Path.GetDirectoryName(mapstudioFolder)}";
-        var gameFolder = $@"{Path.GetDirectoryName(mapFolder)}";
+        var mapStudioFolderPath = $@"{Path.GetDirectoryName(mapFilePath)}";
+        var mapFolderPath = $@"{Path.GetDirectoryName(mapStudioFolderPath)}";
+        var gameFolderPath = $@"{Path.GetDirectoryName(mapFolderPath)}";
         string mapName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(mapFilePath));
+        var mapTpfsFolderPath = $"{mapFolderPath}\\{mapName[..3]}";
+        var mapBndsFolderPath = $@"{mapFolderPath}\{mapName}";
+        var gameObjFolderPath = $@"{gameFolderPath}\obj";
         statusLabel.Invoke(() => statusLabel.Text = @$"Converting {mapName} to OBJ...");
-        var mapTexFolder = $"{mapFolder}\\{mapName[..3]}";
-        var modelFolder = $@"{mapFolder}\{mapName}";
-        var objFolder = $@"{gameFolder}\obj";
-        if (!MSB3.Is(mapFilePath))
-        {
-            Console.WriteLine($@"{Path.GetFileName(mapFilePath)} - is not msb3!");
-            return;
-        }
-        if (!Directory.Exists(modelFolder))
-            Console.WriteLine($@"{modelFolder} - folder doesn't exist!");
-        if (!Directory.Exists(objFolder))
-            Console.WriteLine($@"{objFolder} - folder doesn't exist!");
-        Console.WriteLine(@"Exporting...");
         MSB3 msb = MSB3.Read(mapFilePath);
-        var models = new List<OBJ>();
-        foreach (MSB3.Model.MapPiece? model in msb.Models.MapPieces)
+        foreach (MSB3.Model.MapPiece mapPiece in msb.Models.MapPieces)
         {
-            string objTexFolderPath = $@"{mapstudioFolder}\{mapName}\map_pieces\{model.Name}\textures";
-            string modelPath = $@"{modelFolder}\{mapName}_{model.Name.TrimStart('m')}.mapbnd.dcx";
-            if (!File.Exists(modelPath))
-                continue;
-            BND4 bnd = BND4.Read(modelPath);
-            if (bnd.Files.Count == 0 || !FLVER2.Is(bnd.Files[0].Bytes))
-                continue;
-            FLVER2 flver = FLVER2.Read(bnd.Files[0].Bytes);
-            OBJ obj = FlverToObj(flver);
-            obj.Name = model.Name;
-            models.Add(obj);
-            // TODO: Assign all material texture references in the OBJ
-            string[] tpfFilePaths = Directory.GetFiles(mapTexFolder);
-            foreach (string path in tpfFilePaths)
-            {
-                if (!path.EndsWith(".tpfbhd")) continue;
-                string bdtFilePath = path.Replace("tpfbhd", "tpfbdt");
-                BXF4 bxf4 = BXF4.Read(path, bdtFilePath);
-                foreach (FLVER2.Material material in flver.Materials)
-                {
-                    foreach (FLVER2.Texture texture in material.Textures)
-                    {
-                        string flvTexName = Path.GetFileNameWithoutExtension(texture.Path);
-                        BinderFile? tpfFile = bxf4.Files.FirstOrDefault(i => i.Name.Contains(flvTexName));
-                        if (tpfFile == null) continue;
-                        TPF tpf = TPF.Read(tpfFile.Bytes);
-                        var texFilePath = $@"{objTexFolderPath}\{tpf.Textures[0].Name}.dds";
-                        Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
-                        await File.WriteAllBytesAsync(texFilePath, tpf.Textures[0].Bytes);
-                    }
-                }
-            }
+            string mapPieceFolderPath = $@"{mapStudioFolderPath}\{mapName}\map_pieces\{mapPiece.Name}";
+            var mapPieceObjFilePath = $@"{mapPieceFolderPath}\{mapPiece.Name}.obj";
+            var mapPieceTexFolderPath = $@"{mapPieceFolderPath}\textures";
+            string mapBndFilePath = $@"{mapBndsFolderPath}\{mapName}_{mapPiece.Name.TrimStart('m')}.mapbnd.dcx";
+            FLVER2? mapPieceFlver = ReadFLVERFromBND(mapBndFilePath);
+            if (mapPieceFlver == null) continue;
+            ConvertFLVERToOBJ(mapPieceFlver, mapPieceObjFilePath);
+            ExtractFLVERTextures(mapPieceFlver, mapTpfsFolderPath, mapPieceTexFolderPath);
         }
-        foreach (MSB3.Model.Object? model in msb.Models.Objects)
+        foreach (MSB3.Model.Object obj in msb.Models.Objects)
         {
-            string objTexFolderPath = $@"{mapstudioFolder}\{mapName}\objects\{model.Name}\textures";
-            var modelPath = $@"{objFolder}\{model.Name}.objbnd.dcx";
-            if (!File.Exists(modelPath))
-                continue;
-            BND4 bnd = BND4.Read(modelPath);
-            byte[]? flvBytes = bnd.Files.Find(x => x.Name.ToLower().EndsWith(".flver"))?.Bytes;
-            if (flvBytes == null || !FLVER2.Is(flvBytes))
-                continue;
-            OBJ obj = FlverToObj(FLVER2.Read(flvBytes));
-            obj.Name = model.Name;
-            models.Add(obj);
-            BinderFile? tpfFile = bnd.Files.FirstOrDefault(i => i.Name.EndsWith(".tpf"));
-            if (tpfFile == null) continue;
-            TPF tpf = TPF.Read(tpfFile.Bytes);
-            foreach (TPF.Texture? texture in tpf.Textures)
-            {
-                if (texture == null) continue;
-                var texFilePath = $@"{objTexFolderPath}\{texture.Name}.dds";
-                Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
-                await File.WriteAllBytesAsync(texFilePath, texture.Bytes);
-            }
-        }
-        foreach (MSB3.Part.MapPiece? part in msb.Parts.MapPieces)
-        {
-            OBJ? obj = models.Find(x => x.Name == part.ModelName);
-            if (obj == null)
-                continue;
-            Matrix4x4 matrix = Matrix4x4.Identity;
-            matrix = matrix
-                * Matrix4x4.CreateScale(part.Scale)
-                * Matrix4x4.CreateRotationX((float)(part.Rotation.X * Math.PI / 180f))
-                * Matrix4x4.CreateRotationZ((float)(part.Rotation.Z * Math.PI / 180f))
-                * Matrix4x4.CreateRotationY((float)(part.Rotation.Y * Math.PI / 180f))
-                * Matrix4x4.CreateTranslation(part.Position);
-            obj.Write($@"{mapstudioFolder}\{mapName}\map_pieces\{part.ModelName}\{part.Name}.obj", matrix);
-        }
-        foreach (MSB3.Part.Object? part in msb.Parts.Objects)
-        {
-            OBJ? obj = models.Find(x => x.Name == part.ModelName);
-            if (obj == null)
-                continue;
-            Matrix4x4 matrix = Matrix4x4.Identity;
-            matrix = matrix
-                * Matrix4x4.CreateScale(part.Scale)
-                * Matrix4x4.CreateRotationX((float)(part.Rotation.X * Math.PI / 180f))
-                * Matrix4x4.CreateRotationZ((float)(part.Rotation.Z * Math.PI / 180f))
-                * Matrix4x4.CreateRotationY((float)(part.Rotation.Y * Math.PI / 180f))
-                * Matrix4x4.CreateTranslation(part.Position);
-            obj.Write($@"{mapstudioFolder}\{mapName}\objects\{part.ModelName}\{part.Name}.obj", matrix);
+            string objFolderPath = $@"{mapStudioFolderPath}\{mapName}\objects\{obj.Name}";
+            var objectObjFilePath = $@"{objFolderPath}\{obj.Name}.obj";
+            var objTexFolderPath = $@"{objFolderPath}\textures";
+            var objBndFilePath = $@"{gameObjFolderPath}\{obj.Name}.objbnd.dcx";
+            FLVER2? objFlver = ReadFLVERFromBND(objBndFilePath);
+            if (objFlver == null) continue;
+            ConvertFLVERToOBJ(objFlver, objectObjFilePath);
+            ExtractFLVERTextures(objFlver, mapTpfsFolderPath, objTexFolderPath);
         }
         statusLabel.Invoke(() => statusLabel.Text = @"Conversion complete!");
         await Task.Delay(2000);
         statusLabel.Invoke(() => statusLabel.Text = @"Waiting...");
-    }
-
-    public static OBJ FlverToObj(FLVER2 flv)
-    {
-        var obj = new OBJ();
-        var boneMatrices = new Matrix4x4[flv.Bones.Count];
-        for (var i = 0; i < flv.Bones.Count; i++)
-        {
-            FLVER.Bone bone = flv.Bones[i];
-            Matrix4x4 global = Matrix4x4.Identity;
-            if (bone.ParentIndex != -1)
-                global = boneMatrices[bone.ParentIndex];
-            boneMatrices[i] = bone.ComputeLocalTransform() * global;
-        }
-        var meshCount = 0;
-        var currentFaceIndex = 0;
-        foreach (FLVER2.Mesh? fmesh in flv.Meshes)
-        {
-            var mesh = new OBJ.Mesh
-            {
-                Indices = fmesh.FaceSets.Find(x => x.Flags == FLVER2.FaceSet.FSFlags.None)?.Triangulate(false)
-            };
-            if (fmesh.Vertices.Length == 0 || fmesh.FaceSets.Count == 0 || mesh.Indices!.Count == 0 || mesh.Indices.All(x => x == mesh.Indices[0]))
-                continue;
-            mesh.Name = meshCount.ToString();
-            meshCount++;
-            mesh.MaterialName = mesh.Name;
-            for (var q = 0; q < mesh.Indices.Count; q++)
-                mesh.Indices[q] += currentFaceIndex + 1;
-            currentFaceIndex += fmesh.Vertices.Length;
-            foreach (FLVER.Vertex vert in fmesh.Vertices)
-                mesh.Vertices.Add(vert.Position);
-            obj.Meshes.Add(mesh);
-        }
-        return obj;
     }
 
     private async void DS3MapConverter_KeyDown(object sender, KeyEventArgs e)
@@ -179,31 +78,117 @@ public partial class DS3MapConverter : Form
         await OpenMapToConvert();
     }
 
+    private static void ExtractFLVERTextures(FLVER2 flver, string tpfsPath, string outputTexFolderPath)
+    {
+        string[] tpfFilePaths = Directory.GetFiles(tpfsPath);
+        foreach (string path in tpfFilePaths)
+        {
+            if (!path.EndsWith(".tpfbhd")) continue;
+            string bdtFilePath = path.Replace("tpfbhd", "tpfbdt");
+            BXF4 bxf4 = BXF4.Read(path, bdtFilePath);
+            foreach (FLVER2.Material material in flver.Materials)
+            {
+                foreach (FLVER2.Texture texture in material.Textures)
+                {
+                    string flvTexName = Path.GetFileNameWithoutExtension(texture.Path);
+                    if (!flvTexName.Contains("_a")) continue;
+                    BinderFile? tpfFile = bxf4.Files.FirstOrDefault(i => i.Name.Contains(flvTexName));
+                    if (tpfFile == null) continue;
+                    TPF tpf = TPF.Read(tpfFile.Bytes);
+                    var texFilePath = $@"{outputTexFolderPath}\{tpf.Textures[0].Name}.dds";
+                    Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
+                    File.WriteAllBytes(texFilePath, tpf.Textures[0].Bytes);
+                }
+            }
+        }
+    }
+
+    private static void ConvertFLVERToOBJ(FLVER2 flver, string outputObjFilePath)
+    {
+        var obj = new OBJ();
+        var boneMatrices = new Matrix4x4[flver.Bones.Count];
+        for (var i = 0; i < flver.Bones.Count; i++)
+        {
+            FLVER.Bone bone = flver.Bones[i];
+            Matrix4x4 global = Matrix4x4.Identity;
+            if (bone.ParentIndex != -1)
+                global = boneMatrices[bone.ParentIndex];
+            boneMatrices[i] = bone.ComputeLocalTransform() * global;
+        }
+        var meshCount = 0;
+        var currentFaceIndex = 0;
+        foreach (FLVER2.Mesh? flverMesh in flver.Meshes)
+        {
+            var mesh = new OBJ.Mesh
+            {
+                Indices = flverMesh.FaceSets.Find(x => x.Flags == FLVER2.FaceSet.FSFlags.None)?.Triangulate(false)
+            };
+            if (flverMesh.Vertices.Length == 0 || flverMesh.FaceSets.Count == 0 || mesh.Indices!.Count == 0 || mesh.Indices.All(x => x == mesh.Indices[0]))
+                continue;
+            mesh.Name = meshCount.ToString();
+            meshCount++;
+            mesh.MaterialName = mesh.Name;
+            FLVER2.Material material = flver.Materials[flverMesh.MaterialIndex];
+            FLVER2.Texture? diffuse = material.Textures.Find(i => Path.GetFileName(i.Path).Contains("_a"));
+            if (diffuse != null) obj.AddNewMaterial(mesh.MaterialName, $"{Path.GetFileNameWithoutExtension(diffuse.Path)}.dds");
+            for (var q = 0; q < mesh.Indices.Count; q++)
+                mesh.Indices[q] += currentFaceIndex + 1;
+            currentFaceIndex += flverMesh.Vertices.Length;
+            foreach (FLVER.Vertex vert in flverMesh.Vertices)
+                mesh.Vertices.Add(vert.Position);
+            obj.Meshes.Add(mesh);
+        }
+        string outputObjFolderPath = Path.GetDirectoryName(outputObjFilePath) ?? "";
+        if (!Directory.Exists(outputObjFolderPath)) Directory.CreateDirectory(outputObjFolderPath);
+        obj.Write(outputObjFilePath, Matrix4x4.Identity);
+    }
+
     public class OBJ
     {
         internal OBJ()
         {
+            MTL = "";
             Name = "";
             Meshes = new List<Mesh>();
         }
 
         public string Name { get; set; }
         public List<Mesh> Meshes { get; set; }
+        public string MTL { get; set; }
+
+        public void AddNewMaterial(string name, string diffuseTexName)
+        {
+            string newMaterialEntry = $"newmtl {name}\r\n"
+                + "Ka 1.000000 1.000000 1.000000\r\n"
+                + "Kd 0.800000 0.800000 0.800000\r\n"
+                + "Ks 0.500000 0.500000 0.500000\r\n"
+                + "Ns 200.000000\r\n"
+                + "Ni 1.000000\r\n"
+                + "d 1.000000\r\n"
+                + "illum 2\r\n"
+                + $"map_Kd textures\\\\{diffuseTexName}\r\n\r\n";
+            MTL += newMaterialEntry;
+        }
 
         public void Write(string path, Matrix4x4 transform)
         {
-            var sb = new StringBuilder();
+            var mtlFileName = $"{Path.GetFileNameWithoutExtension(path)}.mtl";
+            var objSb = new StringBuilder();
+            objSb.AppendLine($"mtllib {mtlFileName}");
             foreach (Mesh mesh in Meshes)
             {
                 foreach (Vector3 v in mesh.Vertices.Select(vert => Vector3.Transform(vert, transform) * new Vector3(-1, 1, 1)))
-                    sb.AppendLine($"v  {v.X} {v.Y} {v.Z}");
-                sb.AppendLine($"g {mesh.Name}");
-                sb.AppendLine($"usemtl {mesh.MaterialName}");
+                    objSb.AppendLine($"v  {v.X} {v.Y} {v.Z}");
+                objSb.AppendLine($"g {mesh.Name}");
+                objSb.AppendLine($"usemtl {mesh.MaterialName}");
                 for (var i = 0; i < mesh.Indices!.Count - 2; i += 3)
-                    sb.AppendLine($"f {mesh.Indices[i]} {mesh.Indices[i + 1]} {mesh.Indices[i + 2]}");
+                    objSb.AppendLine($"f {mesh.Indices[i]} {mesh.Indices[i + 1]} {mesh.Indices[i + 2]}");
             }
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            File.WriteAllText(path, sb.ToString());
+            Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
+            File.WriteAllText(path, objSb.ToString());
+            var mtlSb = new StringBuilder();
+            mtlSb.AppendLine(MTL);
+            File.WriteAllText($@"{Path.GetDirectoryName(path)}\{mtlFileName}", MTL);
         }
 
         public class Mesh
