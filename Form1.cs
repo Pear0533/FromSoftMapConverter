@@ -1,6 +1,10 @@
+using System.Drawing.Imaging;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
+using Pfim;
 using SoulsFormats;
+using ImageFormat = System.Drawing.Imaging.ImageFormat;
 
 namespace DS3MapConverter;
 
@@ -78,6 +82,38 @@ public partial class DS3MapConverter : Form
         await OpenMapToConvert();
     }
 
+    private static Bitmap ReadDDSAsBitmap(Stream stream)
+    {
+        IImage image = Pfim.Pfim.FromStream(stream);
+        PixelFormat format;
+        switch (image.Format)
+        {
+            case Pfim.ImageFormat.Rgb24:
+                format = PixelFormat.Format24bppRgb;
+                break;
+            case Pfim.ImageFormat.Rgba32:
+                format = PixelFormat.Format32bppArgb;
+                break;
+            case Pfim.ImageFormat.R5g5b5:
+                format = PixelFormat.Format16bppRgb555;
+                break;
+            case Pfim.ImageFormat.R5g6b5:
+                format = PixelFormat.Format16bppRgb565;
+                break;
+            case Pfim.ImageFormat.R5g5b5a1:
+                format = PixelFormat.Format16bppArgb1555;
+                break;
+            case Pfim.ImageFormat.Rgb8:
+                format = PixelFormat.Format8bppIndexed;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
+        var bitmap = new Bitmap(image.Width, image.Height, image.Stride, format, ptr);
+        return bitmap;
+    }
+
     private static void ExtractFLVERTextures(FLVER2 flver, string tpfsPath, string outputTexFolderPath)
     {
         string[] tpfFilePaths = Directory.GetFiles(tpfsPath);
@@ -95,9 +131,10 @@ public partial class DS3MapConverter : Form
                     BinderFile? tpfFile = bxf4.Files.FirstOrDefault(i => i.Name.Contains(flvTexName));
                     if (tpfFile == null) continue;
                     TPF tpf = TPF.Read(tpfFile.Bytes);
-                    var texFilePath = $@"{outputTexFolderPath}\{tpf.Textures[0].Name}.dds";
+                    var texFilePath = $@"{outputTexFolderPath}\{tpf.Textures[0].Name}.png";
                     Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
-                    File.WriteAllBytes(texFilePath, tpf.Textures[0].Bytes);
+                    Bitmap texBitMap = ReadDDSAsBitmap(new MemoryStream(tpf.Textures[0].Bytes));
+                    texBitMap.Save(texFilePath, ImageFormat.Png);
                 }
             }
         }
@@ -130,7 +167,7 @@ public partial class DS3MapConverter : Form
             mesh.MaterialName = mesh.Name;
             FLVER2.Material material = flver.Materials[flverMesh.MaterialIndex];
             FLVER2.Texture? diffuse = material.Textures.Find(i => Path.GetFileName(i.Path).Contains("_a"));
-            if (diffuse != null) obj.AddNewMaterial(mesh.MaterialName, $"{Path.GetFileNameWithoutExtension(diffuse.Path)}.dds");
+            if (diffuse != null) obj.AddNewMaterial(mesh.MaterialName, $"{Path.GetFileNameWithoutExtension(diffuse.Path)}.png");
             for (var q = 0; q < mesh.Indices.Count; q++)
                 mesh.Indices[q] += currentFaceIndex + 1;
             currentFaceIndex += flverMesh.Vertices.Length;
