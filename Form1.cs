@@ -37,34 +37,38 @@ public partial class DS3MapConverter : Form
     {
         var mapStudioFolderPath = $@"{Path.GetDirectoryName(mapFilePath)}";
         var mapFolderPath = $@"{Path.GetDirectoryName(mapStudioFolderPath)}";
-        var gameFolderPath = $@"{Path.GetDirectoryName(mapFolderPath)}";
+        // var gameFolderPath = $@"{Path.GetDirectoryName(mapFolderPath)}";
         string mapName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(mapFilePath));
-        var mapTpfsFolderPath = $"{mapFolderPath}\\{mapName[..3]}";
-        var mapBndsFolderPath = $@"{mapFolderPath}\{mapName}";
-        var gameObjFolderPath = $@"{gameFolderPath}\obj";
-        statusLabel.Invoke(() => statusLabel.Text = @$"Converting {mapName} to OBJ...");
-        MSB3 msb = MSB3.Read(mapFilePath);
-        foreach (MSB3.Model.MapPiece mapPiece in msb.Models.MapPieces)
+        bool isER = MSBE.Is(mapFilePath);
+        bool isDS3 = MSB3.Is(mapFilePath);
+        // TODO: WIP
+        dynamic? msb = isER ? MSBE.Read(mapFilePath) : isDS3 ? MSB3.Read(mapFilePath) : null;
+        if (msb == null)
         {
-            string mapPieceFolderPath = $@"{mapStudioFolderPath}\{mapName}\map_pieces\{mapPiece.Name}";
+            statusLabel.Invoke(() => statusLabel.Text = @"Selected file is not a map!");
+            await Task.Delay(2000);
+            return;
+        }
+        var mapTpfsFolderPath = $"{mapFolderPath}\\{mapName[..3]}";
+        string mapBndsFolderPath;
+        if (isER)
+        {
+            mapBndsFolderPath = $@"{mapTpfsFolderPath}\{mapName}";
+            mapTpfsFolderPath = mapBndsFolderPath;
+        }
+        else mapBndsFolderPath = $@"{mapFolderPath}\{mapName}";
+        // var gameObjFolderPath = isER ? $@"{gameFolderPath}\\asset\\aeg" : $@"{gameFolderPath}\obj";
+        statusLabel.Invoke(() => statusLabel.Text = @$"Converting {mapName} to OBJ...");
+        foreach (dynamic mapPiece in msb.Models.MapPieces)
+        {
+            string mapPieceFolderPath = $@"{mapBndsFolderPath}\map_pieces\{mapPiece.Name}";
             var mapPieceObjFilePath = $@"{mapPieceFolderPath}\{mapPiece.Name}.obj";
             var mapPieceTexFolderPath = $@"{mapPieceFolderPath}\textures";
             string mapBndFilePath = $@"{mapBndsFolderPath}\{mapName}_{mapPiece.Name.TrimStart('m')}.mapbnd.dcx";
             FLVER2? mapPieceFlver = ReadFLVERFromBND(mapBndFilePath);
             if (mapPieceFlver == null) continue;
             ConvertFLVERToOBJ(mapPieceFlver, mapPieceObjFilePath);
-            ExtractFLVERTextures(mapPieceFlver, mapTpfsFolderPath, mapPieceTexFolderPath);
-        }
-        foreach (MSB3.Model.Object obj in msb.Models.Objects)
-        {
-            string objFolderPath = $@"{mapStudioFolderPath}\{mapName}\objects\{obj.Name}";
-            var objectObjFilePath = $@"{objFolderPath}\{obj.Name}.obj";
-            var objTexFolderPath = $@"{objFolderPath}\textures";
-            var objBndFilePath = $@"{gameObjFolderPath}\{obj.Name}.objbnd.dcx";
-            FLVER2? objFlver = ReadFLVERFromBND(objBndFilePath);
-            if (objFlver == null) continue;
-            ConvertFLVERToOBJ(objFlver, objectObjFilePath);
-            ExtractFLVERTextures(objFlver, mapTpfsFolderPath, objTexFolderPath);
+            ExtractFLVERTextures(mapPieceFlver, mapTpfsFolderPath, mapPieceTexFolderPath, isER);
         }
         statusLabel.Invoke(() => statusLabel.Text = @"Conversion complete!");
         await Task.Delay(2000);
@@ -114,27 +118,36 @@ public partial class DS3MapConverter : Form
         return bitmap;
     }
 
-    private static void ExtractFLVERTextures(FLVER2 flver, string tpfsPath, string outputTexFolderPath)
+    private static void ExtractFLVERTextures(FLVER2 flver, string tpfsPath, string outputTexFolderPath, bool isER)
     {
         string[] tpfFilePaths = Directory.GetFiles(tpfsPath);
         foreach (string path in tpfFilePaths)
         {
-            if (!path.EndsWith(".tpfbhd")) continue;
-            string bdtFilePath = path.Replace("tpfbhd", "tpfbdt");
-            BXF4 bxf4 = BXF4.Read(path, bdtFilePath);
-            foreach (FLVER2.Material material in flver.Materials)
+            if (isER)
             {
-                foreach (FLVER2.Texture texture in material.Textures)
+                if (!path.EndsWith(".tpfbnd.dcx") && !path.Contains("high")) continue;
+                BND4 bnd = BND4.Read(path);
+                Console.WriteLine(bnd);
+            }
+            else
+            {
+                if (!path.EndsWith(".tpfbhd")) continue;
+                string bdtFilePath = path.Replace("tpfbhd", "tpfbdt");
+                BXF4 bxf4 = BXF4.Read(path, bdtFilePath);
+                foreach (FLVER2.Material material in flver.Materials)
                 {
-                    string flvTexName = Path.GetFileNameWithoutExtension(texture.Path);
-                    if (!flvTexName.Contains("_a")) continue;
-                    BinderFile? tpfFile = bxf4.Files.FirstOrDefault(i => i.Name.Contains(flvTexName));
-                    if (tpfFile == null) continue;
-                    TPF tpf = TPF.Read(tpfFile.Bytes);
-                    var texFilePath = $@"{outputTexFolderPath}\{tpf.Textures[0].Name}.png";
-                    Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
-                    Bitmap texBitMap = ReadDDSAsBitmap(new MemoryStream(tpf.Textures[0].Bytes));
-                    texBitMap.Save(texFilePath, ImageFormat.Png);
+                    foreach (FLVER2.Texture texture in material.Textures)
+                    {
+                        string flvTexName = Path.GetFileNameWithoutExtension(texture.Path);
+                        if (!flvTexName.Contains("_a")) continue;
+                        BinderFile? tpfFile = bxf4.Files.FirstOrDefault(i => i.Name.Contains(flvTexName));
+                        if (tpfFile == null) continue;
+                        TPF tpf = TPF.Read(tpfFile.Bytes);
+                        var texFilePath = $@"{outputTexFolderPath}\{tpf.Textures[0].Name}.png";
+                        Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
+                        Bitmap texBitMap = ReadDDSAsBitmap(new MemoryStream(tpf.Textures[0].Bytes));
+                        texBitMap.Save(texFilePath, ImageFormat.Png);
+                    }
                 }
             }
         }
