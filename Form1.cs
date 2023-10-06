@@ -68,7 +68,7 @@ public partial class DS3MapConverter : Form
             FLVER2? mapPieceFlver = ReadFLVERFromBND(mapBndFilePath);
             if (mapPieceFlver == null) continue;
             ConvertFLVERToOBJ(mapPieceFlver, mapPieceObjFilePath);
-            ExtractFLVERTextures(mapPieceFlver, mapTpfsFolderPath, mapPieceTexFolderPath, isER);
+            ExtractFLVERTextures(mapPieceFlver, mapTpfsFolderPath, mapPieceTexFolderPath, mapPiece.Name, isER);
         }
         statusLabel.Invoke(() => statusLabel.Text = @"Conversion complete!");
         await Task.Delay(2000);
@@ -118,16 +118,29 @@ public partial class DS3MapConverter : Form
         return bitmap;
     }
 
-    private static void ExtractFLVERTextures(FLVER2 flver, string tpfsPath, string outputTexFolderPath, bool isER)
+    // TODO: Eliminate as much of these function arguments as possible
+
+    private static void ExtractFLVERTextures(FLVER2 flver, string tpfsPath, string outputTexFolderPath, string mapPieceName, bool isER)
     {
         string[] tpfFilePaths = Directory.GetFiles(tpfsPath);
         foreach (string path in tpfFilePaths)
         {
             if (isER)
             {
-                if (!path.EndsWith(".tpfbnd.dcx") && !path.Contains("high")) continue;
+                if (!path.EndsWith(".tpfbnd.dcx") || !path.Contains("high")) continue;
                 BND4 bnd = BND4.Read(path);
-                Console.WriteLine(bnd);
+                List<TPF> tpfFiles = new();
+                foreach (BinderFile file in bnd.Files)
+                {
+                    string firstMapNameValue = mapPieceName[1..5];
+                    string secondMapNameValue = mapPieceName[5..7];
+                    bool hasFirstMapNameValue = file.Name.Contains(firstMapNameValue);
+                    bool hasSecondMapNameValue = file.Name.Contains(secondMapNameValue);
+                    Console.WriteLine(hasFirstMapNameValue);
+                    Console.WriteLine(hasSecondMapNameValue);
+                    // if (hasFirstMapNameValue && hasSecondMapNameValue) tpfFiles.Add(TPF.Read(file.Bytes));
+                }
+                Console.WriteLine(tpfFiles);
             }
             else
             {

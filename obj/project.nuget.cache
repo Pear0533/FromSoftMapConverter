@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ta8eBuvADtZjhmuN9WnYhkZ/lE2U53z19DoavG4+bPIQIDN5ugHdbQioKCYcWqL+0naq8WdEgCiAmJmeuR9glw==",
+  "dgSpecHash": "2ZNQwmquc+rG7REnGPUAo6CNaBujFQg1bRdKPZrhf1lvVaZl41P2TtoypGAi0PURiYiRUdsgIJnNddd3vlH/5w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Isaac Fisher\\Downloads\\imagine\\DS3MapConverter\\DS3MapConverter.csproj",
+  "projectFilePath": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\DS3MapConverter\\DS3MapConverter.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Isaac Fisher\\.nuget\\packages\\pfim\\0.10.3\\pfim.0.10.3.nupkg.sha512"
   ],
