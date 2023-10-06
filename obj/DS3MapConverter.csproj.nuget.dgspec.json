@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Isaac Fisher\\Downloads\\imagine\\DS3MapConverter\\DS3MapConverter.csproj": {}
+    "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\DS3MapConverter\\DS3MapConverter.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Isaac Fisher\\Downloads\\imagine\\DS3MapConverter\\DS3MapConverter.csproj": {
+    "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\DS3MapConverter\\DS3MapConverter.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Isaac Fisher\\Downloads\\imagine\\DS3MapConverter\\DS3MapConverter.csproj",
+        "projectUniqueName": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\DS3MapConverter\\DS3MapConverter.csproj",
         "projectName": "DS3MapConverter",
-        "projectPath": "C:\\Users\\Isaac Fisher\\Downloads\\imagine\\DS3MapConverter\\DS3MapConverter.csproj",
+        "projectPath": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\DS3MapConverter\\DS3MapConverter.csproj",
         "packagesPath": "C:\\Users\\Isaac Fisher\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Isaac Fisher\\Downloads\\imagine\\DS3MapConverter\\obj\\",
+        "outputPath": "C:\\Users\\Isaac Fisher\\Downloads\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\DS3MapConverter\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Isaac Fisher\\AppData\\Roaming\\NuGet\\NuGet.Config",
