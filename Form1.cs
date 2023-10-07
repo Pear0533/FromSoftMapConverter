@@ -4,7 +4,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Pfim;
 using SoulsFormats;
+using WitchyFormats;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using TPF = WitchyFormats.TPF;
 
 namespace DS3MapConverter;
 
@@ -138,7 +140,8 @@ public partial class DS3MapConverter : Form
                     bool hasSecondMapNameValue = file.Name.Contains(secondMapNameValue);
                     Console.WriteLine(hasFirstMapNameValue);
                     Console.WriteLine(hasSecondMapNameValue);
-                    // if (hasFirstMapNameValue && hasSecondMapNameValue) tpfFiles.Add(TPF.Read(file.Bytes));
+                    if (hasFirstMapNameValue && hasSecondMapNameValue)
+                        tpfFiles.Add(TPF.Read(file.Bytes));
                 }
                 Console.WriteLine(tpfFiles);
             }
@@ -186,7 +189,7 @@ public partial class DS3MapConverter : Form
             {
                 Indices = flverMesh.FaceSets.Find(x => x.Flags == FLVER2.FaceSet.FSFlags.None)?.Triangulate(false)
             };
-            if (flverMesh.Vertices.Length == 0 || flverMesh.FaceSets.Count == 0 || mesh.Indices!.Count == 0 || mesh.Indices.All(x => x == mesh.Indices[0]))
+            if (flverMesh.Vertices.Count == 0 || flverMesh.FaceSets.Count == 0 || mesh.Indices!.Count == 0 || mesh.Indices.All(x => x == mesh.Indices[0]))
                 continue;
             mesh.Name = meshCount.ToString();
             meshCount++;
@@ -196,7 +199,7 @@ public partial class DS3MapConverter : Form
             if (diffuse != null) obj.AddNewMaterial(mesh.MaterialName, $"{Path.GetFileNameWithoutExtension(diffuse.Path)}.png");
             for (var q = 0; q < mesh.Indices.Count; q++)
                 mesh.Indices[q] += currentFaceIndex + 1;
-            currentFaceIndex += flverMesh.Vertices.Length;
+            currentFaceIndex += flverMesh.Vertices.Count;
             foreach (FLVER.Vertex vert in flverMesh.Vertices)
                 mesh.Vertices.Add(vert.Position);
             obj.Meshes.Add(mesh);

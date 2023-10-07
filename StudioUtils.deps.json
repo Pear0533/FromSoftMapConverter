@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "StudioUtils/2.1.1.1": {
+        "runtime": {
+          "StudioUtils.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "StudioUtils/2.1.1.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

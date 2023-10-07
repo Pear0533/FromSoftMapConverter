@@ -6,14 +6,13 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v7.0": {
-      "SoulsFormats/2.1.1.1": {
+      "WitchyFormats/2.1.1.1": {
         "dependencies": {
-          "BouncyCastle.Cryptography": "2.2.0",
-          "System.Text.Encoding.CodePages": "7.0.0",
-          "System.ValueTuple": "4.5.0"
+          "SoulsFormats": "2.1.1.1",
+          "StudioUtils": "2.1.1.1"
         },
         "runtime": {
-          "SoulsFormats.dll": {}
+          "WitchyFormats.dll": {}
         }
       },
       "BouncyCastle.Cryptography/2.2.0": {
@@ -25,11 +24,26 @@
         }
       },
       "System.Text.Encoding.CodePages/7.0.0": {},
-      "System.ValueTuple/4.5.0": {}
+      "System.ValueTuple/4.5.0": {},
+      "SoulsFormats/2.1.1.1": {
+        "dependencies": {
+          "BouncyCastle.Cryptography": "2.2.0",
+          "System.Text.Encoding.CodePages": "7.0.0",
+          "System.ValueTuple": "4.5.0"
+        },
+        "runtime": {
+          "SoulsFormats.dll": {}
+        }
+      },
+      "StudioUtils/2.1.1.1": {
+        "runtime": {
+          "StudioUtils.dll": {}
+        }
+      }
     }
   },
   "libraries": {
-    "SoulsFormats/2.1.1.1": {
+    "WitchyFormats/2.1.1.1": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -54,6 +68,16 @@
       "sha512": "sha512-okurQJO6NRE/apDIP23ajJ0hpiNmJ+f0BwOlB/cSqTLQlw5upkf+5+96+iG2Jw40G1fCVCyPz/FhIABUjMR+RQ==",
       "path": "system.valuetuple/4.5.0",
       "hashPath": "system.valuetuple.4.5.0.nupkg.sha512"
+    },
+    "SoulsFormats/2.1.1.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "StudioUtils/2.1.1.1": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }
