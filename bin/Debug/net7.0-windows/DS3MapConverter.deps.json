@@ -1,15 +1,17 @@
 {
   "runtimeTarget": {
-    "name": ".NETCoreApp,Version=v6.0",
+    "name": ".NETCoreApp,Version=v7.0",
     "signature": ""
   },
   "compilationOptions": {},
   "targets": {
-    ".NETCoreApp,Version=v6.0": {
+    ".NETCoreApp,Version=v7.0": {
       "DS3MapConverter/1.0.0": {
         "dependencies": {
           "Pfim": "0.10.3",
-          "SoulsFormats": "1.0.0.0"
+          "SoulsFormats": "2.1.1.1",
+          "StudioUtils": "2.1.1.1",
+          "WitchyFormats": "2.1.1.1"
         },
         "runtime": {
           "DS3MapConverter.dll": {}
@@ -23,11 +25,27 @@
           }
         }
       },
-      "SoulsFormats/1.0.0.0": {
+      "SoulsFormats/2.1.1.1": {
         "runtime": {
           "SoulsFormats.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
+            "assemblyVersion": "2.1.1.1",
+            "fileVersion": "2.1.1.1"
+          }
+        }
+      },
+      "StudioUtils/2.1.1.1": {
+        "runtime": {
+          "StudioUtils.dll": {
+            "assemblyVersion": "2.1.1.1",
+            "fileVersion": "2.1.1.1"
+          }
+        }
+      },
+      "WitchyFormats/2.1.1.1": {
+        "runtime": {
+          "WitchyFormats.dll": {
+            "assemblyVersion": "2.1.1.1",
+            "fileVersion": "2.1.1.1"
           }
         }
       }
@@ -46,7 +64,17 @@
       "path": "pfim/0.10.3",
       "hashPath": "pfim.0.10.3.nupkg.sha512"
     },
-    "SoulsFormats/1.0.0.0": {
+    "SoulsFormats/2.1.1.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "StudioUtils/2.1.1.1": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WitchyFormats/2.1.1.1": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

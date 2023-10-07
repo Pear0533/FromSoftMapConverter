@@ -2,13 +2,26 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="SoulsFormats\**" />
+    <Compile Remove="StudioUtils\**" />
+    <Compile Remove="WitchyFormats\**" />
+    <EmbeddedResource Remove="SoulsFormats\**" />
+    <EmbeddedResource Remove="StudioUtils\**" />
+    <EmbeddedResource Remove="WitchyFormats\**" />
+    <None Remove="SoulsFormats\**" />
+    <None Remove="StudioUtils\**" />
+    <None Remove="WitchyFormats\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="icon.ico" />
@@ -21,6 +34,12 @@
   <ItemGroup>
     <Reference Include="SoulsFormats">
       <HintPath>SoulsFormats.dll</HintPath>
+    </Reference>
+    <Reference Include="StudioUtils">
+      <HintPath>StudioUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="WitchyFormats">
+      <HintPath>WitchyFormats.dll</HintPath>
     </Reference>
   </ItemGroup>
 
