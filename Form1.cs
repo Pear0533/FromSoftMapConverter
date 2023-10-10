@@ -122,6 +122,17 @@ public partial class DS3MapConverter : Form
 
     // TODO: Eliminate as much of these function arguments as possible
 
+    private static void ExportTPFTextures(TPF tpf, string outputTexFolderPath, int numToExport)
+    {
+        for (int i = 0; i < numToExport; i++)
+        {
+            string texFilePath = $@"{outputTexFolderPath}\{tpf.Textures[i].Name}.png";
+            Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
+            Bitmap texBitMap = ReadDDSAsBitmap(new MemoryStream(tpf.Textures[i].Bytes));
+            texBitMap.Save(texFilePath, ImageFormat.Png);
+        }
+    }
+
     private static void ExtractFLVERTextures(FLVER2 flver, string tpfsPath, string outputTexFolderPath, string mapPieceName, bool isER)
     {
         string[] tpfFilePaths = Directory.GetFiles(tpfsPath);
@@ -140,10 +151,10 @@ public partial class DS3MapConverter : Form
                     bool hasSecondMapNameValue = file.Name.Contains(secondMapNameValue);
                     Console.WriteLine(hasFirstMapNameValue);
                     Console.WriteLine(hasSecondMapNameValue);
-                    if (hasFirstMapNameValue && hasSecondMapNameValue)
+                    if (hasFirstMapNameValue && hasSecondMapNameValue && !file.Name.Contains("rem"))
                         tpfFiles.Add(TPF.Read(file.Bytes));
                 }
-                Console.WriteLine(tpfFiles);
+                tpfFiles.ForEach(i => ExportTPFTextures(i, outputTexFolderPath, i.Textures.Count));
             }
             else
             {
@@ -159,10 +170,7 @@ public partial class DS3MapConverter : Form
                         BinderFile? tpfFile = bxf4.Files.FirstOrDefault(i => i.Name.Contains(flvTexName));
                         if (tpfFile == null) continue;
                         TPF tpf = TPF.Read(tpfFile.Bytes);
-                        var texFilePath = $@"{outputTexFolderPath}\{tpf.Textures[0].Name}.png";
-                        Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
-                        Bitmap texBitMap = ReadDDSAsBitmap(new MemoryStream(tpf.Textures[0].Bytes));
-                        texBitMap.Save(texFilePath, ImageFormat.Png);
+                        ExportTPFTextures(tpf, outputTexFolderPath, 1);
                     }
                 }
             }
