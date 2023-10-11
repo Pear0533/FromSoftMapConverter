@@ -30,6 +30,16 @@ public partial class DS3MapConverter : Form
         await Task.Run(async () => await ConvertMapToOBJ(dialog.FileName));
     }
 
+    private static TPF ReadTPFFromBND(string bndFilePath)
+    {
+        if (!File.Exists(bndFilePath)) return null;
+        BND4 bnd = BND4.Read(bndFilePath);
+        BinderFile tpfBinderFile = bnd.Files.Find(i => i.Name.EndsWith(".tpf"));
+        if (tpfBinderFile == null) return null;
+        TPF tpf = TPF.Read(tpfBinderFile.Bytes);
+        return tpf;
+    }
+
     private static FLVER2 ReadFLVERFromBND(string bndFilePath)
     {
         if (!File.Exists(bndFilePath)) return null;
@@ -74,7 +84,7 @@ public partial class DS3MapConverter : Form
             MapTpfsPath = $"{GameFolderPath}\\asset\\aet";
         }
         else mapBndsFolderPath = $"{mapFolderPath}\\{mapName}";
-        // var gameObjFolderPath = isER ? $"{gameFolderPath}\\asset\\aeg" : $"{gameFolderPath}\\obj";
+        // string gameObjFolderPath = IsEldenRingMsb ? $"{GameFolderPath}\\asset\\aeg" : $"{GameFolderPath}\\obj";
         statusLabel.Invoke(() => statusLabel.Text = $@"Converting {mapName} to OBJ...");
         foreach (dynamic mapPiece in msb.Models.MapPieces)
         {
@@ -85,8 +95,22 @@ public partial class DS3MapConverter : Form
             FLVER2 mapPieceFlver = ReadFLVERFromBND(mapBndFilePath);
             if (mapPieceFlver == null) continue;
             ConvertFLVERToOBJ(mapPieceFlver, mapPieceObjFilePath);
-            if (!IsEldenRingMsb) ExtractDS3FLVERTextures(mapPieceFlver, mapPieceTexFolderPath);
+            if (!IsEldenRingMsb) ExtractDS3FLVERMapPieceTextures(mapPieceFlver, mapPieceTexFolderPath);
         }
+        // TODO: Implement support for ELDEN RING object exporting
+        /*
+        foreach (MSB3.Model.Object obj in msb.Models.Objects)
+        {
+            string objFolderPath = $"{mapBndsFolderPath}\\objects\\{obj.Name}";
+            string objectObjFilePath = $"{objFolderPath}\\{obj.Name}.obj";
+            string objTexFolderPath = $"{objFolderPath}\\textures";
+            string objBndFilePath = $"{gameObjFolderPath}\\{obj.Name}.objbnd.dcx";
+            FLVER2 objFlver = ReadFLVERFromBND(objBndFilePath);
+            if (objFlver == null) continue;
+            ConvertFLVERToOBJ(objFlver, objectObjFilePath);
+            ExtractDS3FLVERObjectTextures(objBndFilePath, objTexFolderPath);
+        }
+        */
         statusLabel.Invoke(() => statusLabel.Text = @"Conversion complete!");
         await Task.Delay(2000);
         statusLabel.Invoke(() => statusLabel.Text = @"Waiting...");
@@ -103,7 +127,7 @@ public partial class DS3MapConverter : Form
         await OpenMapToConvert();
     }
 
-    private static Bitmap ReadDDSAsBitmap(Stream stream)
+    private static void SaveDDS(Stream stream, string texFilePath)
     {
         IImage image = Pfim.Pfim.FromStream(stream);
         PixelFormat format;
@@ -130,20 +154,34 @@ public partial class DS3MapConverter : Form
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
-        Bitmap bitmap = new(image.Width, image.Height, image.Stride, format, ptr);
-        return bitmap;
+        GCHandle handle = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
+        try
+        {
+            IntPtr data = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
+            Bitmap bitmap = new(image.Width, image.Height, image.Stride, format, data);
+            bitmap.Save(texFilePath, ImageFormat.Png);
+        }
+        finally
+        {
+            handle.Free();
+        }
     }
 
     private static void ExportTPFTexture(TPF.Texture texture, string outputTexFolderPath)
     {
         string texFilePath = $"{outputTexFolderPath}\\{texture?.Name}.png";
         Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
-        Bitmap texBitMap = ReadDDSAsBitmap(new MemoryStream(texture?.Bytes ?? Array.Empty<byte>()));
-        texBitMap.Save(texFilePath, ImageFormat.Png);
+        SaveDDS(new MemoryStream(texture?.Bytes ?? Array.Empty<byte>()), texFilePath);
     }
 
-    private static void ExtractDS3FLVERTextures(FLVER2 flver, string outputTexFolderPath)
+    private static void ExtractDS3FLVERObjectTextures(string objBndFilePath, string outputTexFolderPath)
+    {
+        TPF tpf = ReadTPFFromBND(objBndFilePath);
+        List<TPF.Texture> diffuseTextures = tpf.Textures.FindAll(i => i.Name.Contains("_a"));
+        diffuseTextures.ForEach(i => ExportTPFTexture(i, outputTexFolderPath));
+    }
+
+    private static void ExtractDS3FLVERMapPieceTextures(FLVER2 flver, string outputTexFolderPath)
     {
         string[] tpfFilePaths = Directory.GetFiles(MapTpfsPath);
         foreach (string path in tpfFilePaths)
@@ -203,7 +241,7 @@ public partial class DS3MapConverter : Form
                 {
                     string matbinBndFilePath = $"{GameFolderPath}\\material\\allmaterial.matbinbnd.dcx";
                     BND4 matbinBnd = BND4.Read(matbinBndFilePath);
-                    // TODO: Account for special textures
+                    // TODO: Determine how to best utilize unused textures and account for special textures
                     BinderFile matbinFile = matbinBnd.Files.FirstOrDefault(i => i.Name.Contains(material.Name));
                     if (!MATBIN.IsRead(matbinFile?.Bytes, out MATBIN matbin)) continue;
                     MATBIN.Sampler diffuseTexSampler = matbin.Samplers.Find(i => i.Path.Contains("_a"));
