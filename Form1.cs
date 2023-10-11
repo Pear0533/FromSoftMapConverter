@@ -6,6 +6,7 @@ using Pfim;
 using SoulsFormats;
 using WitchyFormats;
 using ImageFormat = System.Drawing.Imaging.ImageFormat;
+using MATBIN = SoulsFormats.MATBIN;
 using TPF = WitchyFormats.TPF;
 
 namespace DS3MapConverter;
@@ -19,21 +20,21 @@ public partial class DS3MapConverter : Form
     }
 
     private static bool IsEldenRingMsb;
-    private static bool IsDarkSouls3Msb;
     private static string MapTpfsPath;
+    private static string GameFolderPath;
 
     private async Task OpenMapToConvert()
     {
-        var dialog = new OpenFileDialog { Filter = @"Map File (*.msb.dcx)|*.msb.dcx" };
+        OpenFileDialog dialog = new() { Filter = @"Map File (*.msb.dcx)|*.msb.dcx" };
         if (dialog.ShowDialog() != DialogResult.OK) return;
         await Task.Run(async () => await ConvertMapToOBJ(dialog.FileName));
     }
 
-    private static FLVER2? ReadFLVERFromBND(string bndFilePath)
+    private static FLVER2 ReadFLVERFromBND(string bndFilePath)
     {
         if (!File.Exists(bndFilePath)) return null;
         BND4 bnd = BND4.Read(bndFilePath);
-        BinderFile? flverBinderFile = bnd.Files.Find(i => i.Name.EndsWith(".flver"));
+        BinderFile flverBinderFile = bnd.Files.Find(i => i.Name.EndsWith(".flver"));
         if (flverBinderFile == null) return null;
         FLVER2 flver = FLVER2.Read(flverBinderFile.Bytes);
         return flver;
@@ -41,39 +42,50 @@ public partial class DS3MapConverter : Form
 
     private async Task ConvertMapToOBJ(string mapFilePath)
     {
-        var mapStudioFolderPath = $@"{Path.GetDirectoryName(mapFilePath)}";
-        var mapFolderPath = $@"{Path.GetDirectoryName(mapStudioFolderPath)}";
-        // var gameFolderPath = $@"{Path.GetDirectoryName(mapFolderPath)}";
+        string mapStudioFolderPath = $"{Path.GetDirectoryName(mapFilePath)}";
+        string mapFolderPath = $"{Path.GetDirectoryName(mapStudioFolderPath)}";
+        GameFolderPath = $"{Path.GetDirectoryName(mapFolderPath)}";
+        dynamic msb;
         string mapName = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(mapFilePath));
-        IsEldenRingMsb = MSBE.Is(mapFilePath);
-        IsDarkSouls3Msb = MSB3.Is(mapFilePath);
-        dynamic? msb = IsEldenRingMsb ? MSBE.Read(mapFilePath) : IsDarkSouls3Msb ? MSB3.Read(mapFilePath) : null;
-        if (msb == null)
+        try
         {
-            statusLabel.Invoke(() => statusLabel.Text = @"Selected file is not a map!");
-            await Task.Delay(2000);
-            return;
+            msb = MSBE.Read(mapFilePath);
+            IsEldenRingMsb = true;
         }
-        MapTpfsPath = $"{mapFolderPath}\\{mapName[..3]}";
+        catch
+        {
+            try
+            {
+                msb = MSB3.Read(mapFilePath);
+                IsEldenRingMsb = false;
+            }
+            catch
+            {
+                statusLabel.Invoke(() => statusLabel.Text = @"Selected file is not a map!");
+                await Task.Delay(2000);
+                return;
+            }
+        }
+        MapTpfsPath = $"{mapFolderPath}\\{mapName?[..3]}";
         string mapBndsFolderPath;
         if (IsEldenRingMsb)
         {
-            mapBndsFolderPath = $@"{MapTpfsPath}\{mapName}";
-            MapTpfsPath = mapBndsFolderPath;
+            mapBndsFolderPath = $"{MapTpfsPath}\\{mapName}";
+            MapTpfsPath = $"{GameFolderPath}\\asset\\aet";
         }
-        else mapBndsFolderPath = $@"{mapFolderPath}\{mapName}";
-        // var gameObjFolderPath = isER ? $@"{gameFolderPath}\\asset\\aeg" : $@"{gameFolderPath}\obj";
-        statusLabel.Invoke(() => statusLabel.Text = @$"Converting {mapName} to OBJ...");
+        else mapBndsFolderPath = $"{mapFolderPath}\\{mapName}";
+        // var gameObjFolderPath = isER ? $"{gameFolderPath}\\asset\\aeg" : $"{gameFolderPath}\\obj";
+        statusLabel.Invoke(() => statusLabel.Text = $@"Converting {mapName} to OBJ...");
         foreach (dynamic mapPiece in msb.Models.MapPieces)
         {
-            string mapPieceFolderPath = $@"{mapBndsFolderPath}\map_pieces\{mapPiece.Name}";
-            var mapPieceObjFilePath = $@"{mapPieceFolderPath}\{mapPiece.Name}.obj";
-            var mapPieceTexFolderPath = $@"{mapPieceFolderPath}\textures";
-            string mapBndFilePath = $@"{mapBndsFolderPath}\{mapName}_{mapPiece.Name.TrimStart('m')}.mapbnd.dcx";
-            FLVER2? mapPieceFlver = ReadFLVERFromBND(mapBndFilePath);
+            string mapPieceFolderPath = $"{mapBndsFolderPath}\\map_pieces\\{mapPiece.Name}";
+            string mapPieceObjFilePath = $"{mapPieceFolderPath}\\{mapPiece.Name}.obj";
+            string mapPieceTexFolderPath = $"{mapPieceFolderPath}\\textures";
+            string mapBndFilePath = $"{mapBndsFolderPath}\\{mapName}_{mapPiece.Name.TrimStart('m')}.mapbnd.dcx";
+            FLVER2 mapPieceFlver = ReadFLVERFromBND(mapBndFilePath);
             if (mapPieceFlver == null) continue;
             ConvertFLVERToOBJ(mapPieceFlver, mapPieceObjFilePath);
-            ExtractFLVERTextures(mapPieceFlver, mapPieceTexFolderPath, mapPiece.Name);
+            if (!IsEldenRingMsb) ExtractDS3FLVERTextures(mapPieceFlver, mapPieceTexFolderPath);
         }
         statusLabel.Invoke(() => statusLabel.Text = @"Conversion complete!");
         await Task.Delay(2000);
@@ -119,60 +131,36 @@ public partial class DS3MapConverter : Form
                 throw new ArgumentOutOfRangeException();
         }
         IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
-        var bitmap = new Bitmap(image.Width, image.Height, image.Stride, format, ptr);
+        Bitmap bitmap = new(image.Width, image.Height, image.Stride, format, ptr);
         return bitmap;
     }
 
-    private static void ExportTPFTextures(TPF tpf, string outputTexFolderPath, int numToExport)
+    private static void ExportTPFTexture(TPF.Texture texture, string outputTexFolderPath)
     {
-        for (int i = 0; i < numToExport; i++)
-        {
-            string texFilePath = $@"{outputTexFolderPath}\{tpf.Textures[i].Name}.png";
-            Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
-            Bitmap texBitMap = ReadDDSAsBitmap(new MemoryStream(tpf.Textures[i].Bytes));
-            texBitMap.Save(texFilePath, ImageFormat.Png);
-        }
+        string texFilePath = $"{outputTexFolderPath}\\{texture?.Name}.png";
+        Directory.CreateDirectory(Path.GetDirectoryName(texFilePath) ?? "");
+        Bitmap texBitMap = ReadDDSAsBitmap(new MemoryStream(texture?.Bytes ?? Array.Empty<byte>()));
+        texBitMap.Save(texFilePath, ImageFormat.Png);
     }
 
-    private static void ExtractFLVERTextures(FLVER2 flver, string outputTexFolderPath, string mapPieceName)
+    private static void ExtractDS3FLVERTextures(FLVER2 flver, string outputTexFolderPath)
     {
         string[] tpfFilePaths = Directory.GetFiles(MapTpfsPath);
         foreach (string path in tpfFilePaths)
         {
-            if (IsEldenRingMsb)
+            if (!path.EndsWith(".tpfbhd")) continue;
+            string bdtFilePath = path.Replace("tpfbhd", "tpfbdt");
+            BXF4 bxf4 = BXF4.Read(path, bdtFilePath);
+            foreach (FLVER2.Material material in flver.Materials)
             {
-                if (!path.EndsWith(".tpfbnd.dcx") || !path.Contains("high")) continue;
-                BND4 bnd = BND4.Read(path);
-                List<TPF> tpfFiles = new();
-                foreach (BinderFile file in bnd.Files)
+                foreach (FLVER2.Texture texture in material.Textures)
                 {
-                    string firstMapNameValue = mapPieceName[1..5];
-                    string secondMapNameValue = mapPieceName[5..7];
-                    bool hasFirstMapNameValue = file.Name.Contains(firstMapNameValue);
-                    bool hasSecondMapNameValue = file.Name.Contains(secondMapNameValue);
-                    Console.WriteLine(hasFirstMapNameValue);
-                    Console.WriteLine(hasSecondMapNameValue);
-                    if (hasFirstMapNameValue && hasSecondMapNameValue && !file.Name.Contains("rem"))
-                        tpfFiles.Add(TPF.Read(file.Bytes));
-                }
-                tpfFiles.ForEach(i => ExportTPFTextures(i, outputTexFolderPath, i.Textures.Count));
-            }
-            else
-            {
-                if (!path.EndsWith(".tpfbhd")) continue;
-                string bdtFilePath = path.Replace("tpfbhd", "tpfbdt");
-                BXF4 bxf4 = BXF4.Read(path, bdtFilePath);
-                foreach (FLVER2.Material material in flver.Materials)
-                {
-                    foreach (FLVER2.Texture texture in material.Textures)
-                    {
-                        string flvTexName = Path.GetFileNameWithoutExtension(texture.Path);
-                        if (!flvTexName.Contains("_a")) continue;
-                        BinderFile? tpfFile = bxf4.Files.FirstOrDefault(i => i.Name.Contains(flvTexName));
-                        if (tpfFile == null) continue;
-                        TPF tpf = TPF.Read(tpfFile.Bytes);
-                        ExportTPFTextures(tpf, outputTexFolderPath, 1);
-                    }
+                    string flvTexName = Path.GetFileNameWithoutExtension(texture.Path) ?? "";
+                    if (!flvTexName.Contains("_a")) continue;
+                    BinderFile tpfFile = bxf4.Files.FirstOrDefault(i => i.Name.Contains(flvTexName));
+                    if (tpfFile == null) continue;
+                    TPF tpf = TPF.Read(tpfFile.Bytes);
+                    tpf.Textures.ForEach(i => ExportTPFTexture(i, outputTexFolderPath));
                 }
             }
         }
@@ -180,9 +168,9 @@ public partial class DS3MapConverter : Form
 
     private static void ConvertFLVERToOBJ(FLVER2 flver, string outputObjFilePath)
     {
-        var obj = new OBJ();
-        var boneMatrices = new Matrix4x4[flver.Bones.Count];
-        for (var i = 0; i < flver.Bones.Count; i++)
+        OBJ obj = new();
+        Matrix4x4[] boneMatrices = new Matrix4x4[flver.Bones.Count];
+        for (int i = 0; i < flver.Bones.Count; i++)
         {
             FLVER.Bone bone = flver.Bones[i];
             Matrix4x4 global = Matrix4x4.Identity;
@@ -190,11 +178,13 @@ public partial class DS3MapConverter : Form
                 global = boneMatrices[bone.ParentIndex];
             boneMatrices[i] = bone.ComputeLocalTransform() * global;
         }
-        var meshCount = 0;
-        var currentFaceIndex = 0;
-        foreach (FLVER2.Mesh? flverMesh in flver.Meshes)
+        int meshCount = 0;
+        int currentFaceIndex = 0;
+        string outputObjFolderPath = Path.GetDirectoryName(outputObjFilePath) ?? "";
+        string outputTexFolderPath = $"{outputObjFolderPath}\\textures";
+        foreach (FLVER2.Mesh flverMesh in flver.Meshes)
         {
-            var mesh = new OBJ.Mesh
+            OBJ.Mesh mesh = new()
             {
                 Indices = flverMesh.FaceSets.Find(x => x.Flags == FLVER2.FaceSet.FSFlags.None)?.Triangulate(false)
             };
@@ -203,18 +193,38 @@ public partial class DS3MapConverter : Form
             mesh.Name = meshCount.ToString();
             meshCount++;
             mesh.MaterialName = mesh.Name;
-            // TODO: WIP
             FLVER2.Material material = flver.Materials[flverMesh.MaterialIndex];
-            FLVER2.Texture? diffuse = material.Textures.Find(i => Path.GetFileName(i.Path).Contains("_a"));
-            if (diffuse != null) obj.AddNewMaterial(mesh.MaterialName, $"{Path.GetFileNameWithoutExtension(diffuse.Path)}.png");
-            for (var q = 0; q < mesh.Indices.Count; q++)
+            FLVER2.Texture diffuse = IsEldenRingMsb ? material.Textures.Find(i => i.Type.Contains("AlbedoMap"))
+                : material.Textures.Find(i => (Path.GetFileName(i.Path) ?? "").Contains("_a"));
+            if (diffuse != null)
+            {
+                string diffuseTexName = $"{Path.GetFileNameWithoutExtension(diffuse.Path)}.png";
+                if (IsEldenRingMsb)
+                {
+                    string matbinBndFilePath = $"{GameFolderPath}\\material\\allmaterial.matbinbnd.dcx";
+                    BND4 matbinBnd = BND4.Read(matbinBndFilePath);
+                    // TODO: Account for special textures
+                    BinderFile matbinFile = matbinBnd.Files.FirstOrDefault(i => i.Name.Contains(material.Name));
+                    if (!MATBIN.IsRead(matbinFile?.Bytes, out MATBIN matbin)) continue;
+                    MATBIN.Sampler diffuseTexSampler = matbin.Samplers.Find(i => i.Path.Contains("_a"));
+                    if (diffuseTexSampler == null) continue;
+                    string tpfFileName = $"{Path.GetFileNameWithoutExtension(diffuseTexSampler.Path)?.Replace("_a", "").ToLower()}.tpf.dcx";
+                    string[] tpfFilePaths = Directory.GetFiles(MapTpfsPath, "*.*", SearchOption.AllDirectories);
+                    string tpfFilePath = tpfFilePaths.ToList().Find(i => i.Contains(tpfFileName));
+                    if (!TPF.IsRead(tpfFilePath, out TPF tpf)) continue;
+                    TPF.Texture diffuseTexture = tpf.Textures.Find(i => i.Name.Contains("_a"));
+                    diffuseTexName = $"{diffuseTexture?.Name}.png";
+                    ExportTPFTexture(diffuseTexture, outputTexFolderPath);
+                }
+                obj.AddNewMaterial(mesh.MaterialName, diffuseTexName);
+            }
+            for (int q = 0; q < mesh.Indices.Count; q++)
                 mesh.Indices[q] += currentFaceIndex + 1;
             currentFaceIndex += flverMesh.Vertices.Count;
             foreach (FLVER.Vertex vert in flverMesh.Vertices)
                 mesh.Vertices.Add(vert.Position);
             obj.Meshes.Add(mesh);
         }
-        string outputObjFolderPath = Path.GetDirectoryName(outputObjFilePath) ?? "";
         if (!Directory.Exists(outputObjFolderPath)) Directory.CreateDirectory(outputObjFolderPath);
         obj.Write(outputObjFilePath, Matrix4x4.Identity);
     }
@@ -248,8 +258,8 @@ public partial class DS3MapConverter : Form
 
         public void Write(string path, Matrix4x4 transform)
         {
-            var mtlFileName = $"{Path.GetFileNameWithoutExtension(path)}.mtl";
-            var objSb = new StringBuilder();
+            string mtlFileName = $"{Path.GetFileNameWithoutExtension(path)}.mtl";
+            StringBuilder objSb = new();
             objSb.AppendLine($"mtllib {mtlFileName}");
             foreach (Mesh mesh in Meshes)
             {
@@ -257,14 +267,14 @@ public partial class DS3MapConverter : Form
                     objSb.AppendLine($"v  {v.X} {v.Y} {v.Z}");
                 objSb.AppendLine($"g {mesh.Name}");
                 objSb.AppendLine($"usemtl {mesh.MaterialName}");
-                for (var i = 0; i < mesh.Indices!.Count - 2; i += 3)
+                for (int i = 0; i < mesh.Indices!.Count - 2; i += 3)
                     objSb.AppendLine($"f {mesh.Indices[i]} {mesh.Indices[i + 1]} {mesh.Indices[i + 2]}");
             }
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? "");
             File.WriteAllText(path, objSb.ToString());
-            var mtlSb = new StringBuilder();
+            StringBuilder mtlSb = new();
             mtlSb.AppendLine(MTL);
-            File.WriteAllText($@"{Path.GetDirectoryName(path)}\{mtlFileName}", MTL);
+            File.WriteAllText($"{Path.GetDirectoryName(path)}\\{mtlFileName}", MTL);
         }
 
         public class Mesh
@@ -279,7 +289,7 @@ public partial class DS3MapConverter : Form
 
             public string Name { get; set; }
             public string MaterialName { get; set; }
-            public List<int>? Indices { get; set; }
+            public List<int> Indices { get; set; }
             public List<Vector3> Vertices { get; set; }
         }
     }
