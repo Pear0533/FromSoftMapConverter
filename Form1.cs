@@ -241,7 +241,7 @@ public partial class DS3MapConverter : Form
                 {
                     string matbinBndFilePath = $"{GameFolderPath}\\material\\allmaterial.matbinbnd.dcx";
                     BND4 matbinBnd = BND4.Read(matbinBndFilePath);
-                    // TODO: Determine how to best utilize unused textures and account for special textures
+                    // TODO: Determine how to best utilize unused textures
                     BinderFile matbinFile = matbinBnd.Files.FirstOrDefault(i => i.Name.Contains(material.Name));
                     if (!MATBIN.IsRead(matbinFile?.Bytes, out MATBIN matbin)) continue;
                     MATBIN.Sampler diffuseTexSampler = matbin.Samplers.Find(i => i.Path.Contains("_a"));
