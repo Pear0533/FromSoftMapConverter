@@ -245,16 +245,19 @@ public partial class DS3MapConverter : Form
                     BinderFile matbinFile = matbinBnd.Files.FirstOrDefault(i => i.Name.Contains(material.Name));
                     if (!MATBIN.IsRead(matbinFile?.Bytes, out MATBIN matbin)) continue;
                     MATBIN.Sampler diffuseTexSampler = matbin.Samplers.Find(i => i.Path.Contains("_a"));
-                    if (diffuseTexSampler == null) continue;
-                    string tpfFileName = $"{Path.GetFileNameWithoutExtension(diffuseTexSampler.Path)?.Replace("_a", "").ToLower()}.tpf.dcx";
-                    string[] tpfFilePaths = Directory.GetFiles(MapTpfsPath, "*.*", SearchOption.AllDirectories);
-                    string tpfFilePath = tpfFilePaths.ToList().Find(i => i.Contains(tpfFileName));
-                    if (!TPF.IsRead(tpfFilePath, out TPF tpf)) continue;
-                    TPF.Texture diffuseTexture = tpf.Textures.Find(i => i.Name.Contains("_a"));
-                    diffuseTexName = $"{diffuseTexture?.Name}.png";
-                    ExportTPFTexture(diffuseTexture, outputTexFolderPath);
+                    if (diffuseTexSampler != null)
+                    {
+                        string tpfFileName = $"{Path.GetFileNameWithoutExtension(diffuseTexSampler.Path)?.Replace("_a", "").ToLower()}.tpf.dcx";
+                        string[] tpfFilePaths = Directory.GetFiles(MapTpfsPath, "*.*", SearchOption.AllDirectories);
+                        string tpfFilePath = tpfFilePaths.ToList().Find(i => i.Contains(tpfFileName));
+                        if (!TPF.IsRead(tpfFilePath, out TPF tpf)) continue;
+                        TPF.Texture diffuseTexture = tpf.Textures.Find(i => i.Name.Contains("_a"));
+                        diffuseTexName = $"{diffuseTexture?.Name}.png";
+                        ExportTPFTexture(diffuseTexture, outputTexFolderPath);
+                        obj.AddNewMaterial(mesh.MaterialName, diffuseTexName);
+                    }
+                    else mesh.MaterialName = meshCount.ToString();
                 }
-                obj.AddNewMaterial(mesh.MaterialName, diffuseTexName);
             }
             for (int q = 0; q < mesh.Indices.Count; q++)
                 mesh.Indices[q] += currentFaceIndex + 1;
