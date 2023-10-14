@@ -1,13 +1,13 @@
-﻿namespace DS3MapConverter
+﻿namespace FromSoftMapConverter
 {
-    partial class DS3MapConverter
+    partial class FromSoftMapConverter
     {
         /// <summary>
         ///  Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
+        /// <summary>s
         ///  Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DS3MapConverter));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FromSoftMapConverter));
             ribbon = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             openCtrlOToolStripMenuItem = new ToolStripMenuItem();
@@ -92,7 +92,7 @@
             statusLabel.TabIndex = 3;
             statusLabel.Text = "Waiting...";
             // 
-            // DS3MapConverter
+            // FromSoftMapConverter
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -104,9 +104,9 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = ribbon;
             Margin = new Padding(2);
-            Name = "DS3MapConverter";
-            Text = "DS3MapConverter";
-            KeyDown += DS3MapConverter_KeyDown;
+            Name = "FromSoftMapConverter";
+            Text = "FromSoftMapConverter";
+            KeyDown += FromSoftMapConverter_KeyDown;
             ribbon.ResumeLayout(false);
             ribbon.PerformLayout();
             ResumeLayout(false);

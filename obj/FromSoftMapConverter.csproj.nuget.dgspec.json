@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\DS3MapConverter.csproj": {}
+    "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\FromSoftMapConverter.csproj": {}
   },
   "projects": {
-    "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\DS3MapConverter.csproj": {
+    "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\FromSoftMapConverter.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\DS3MapConverter.csproj",
-        "projectName": "DS3MapConverter",
-        "projectPath": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\DS3MapConverter.csproj",
+        "projectUniqueName": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\FromSoftMapConverter.csproj",
+        "projectName": "FromSoftMapConverter",
+        "projectPath": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\FromSoftMapConverter.csproj",
         "packagesPath": "C:\\Users\\Isaac Fisher\\.nuget\\packages\\",
         "outputPath": "D:\\Syncthing Shared\\Game Mods & Tools\\Tools\\FromSoftware\\Repositories\\Active\\FromSoftMapConverter\\obj\\",
         "projectStyle": "PackageReference",
