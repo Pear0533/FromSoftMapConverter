@@ -1,4 +1,4 @@
-namespace DS3MapConverter
+namespace FromSoftMapConverter
 {
     internal static class Program
     {
@@ -11,7 +11,7 @@ namespace DS3MapConverter
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new DS3MapConverter());
+            Application.Run(new FromSoftMapConverter());
         }
     }
 }

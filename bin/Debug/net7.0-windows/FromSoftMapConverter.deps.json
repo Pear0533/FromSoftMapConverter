@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v7.0": {
-      "DS3MapConverter/1.0.0": {
+      "FromSoftMapConverter/1.0.0": {
         "dependencies": {
           "Pfim": "0.10.3",
           "SoulsFormats": "2.1.1.1",
@@ -14,7 +14,7 @@
           "WitchyFormats": "2.1.1.1"
         },
         "runtime": {
-          "DS3MapConverter.dll": {}
+          "FromSoftMapConverter.dll": {}
         }
       },
       "Pfim/0.10.3": {
@@ -52,7 +52,7 @@
     }
   },
   "libraries": {
-    "DS3MapConverter/1.0.0": {
+    "FromSoftMapConverter/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
